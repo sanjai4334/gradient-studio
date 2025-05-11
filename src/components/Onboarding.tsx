@@ -26,12 +26,6 @@ const Onboarding: React.FC<OnboardingProps> = ({ onClose }) => {
       icon: <Download size={40} />,
       description: "Copy the CSS code directly or download gradients as PNG files.",
       tip: "Hover over any gradient to see the available actions."
-    },
-    {
-      title: "Favorites",
-      icon: <Star size={40} />,
-      description: "Star your favorite gradients to save them for later use.",
-      tip: "Favorited gradients are saved even when you close the browser."
     }
   ];
   

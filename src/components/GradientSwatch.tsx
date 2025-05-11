@@ -16,7 +16,7 @@ interface GradientSwatchProps {
 
 const GradientSwatch: React.FC<GradientSwatchProps> = ({ gradient, index, fullPage = false, selected = false, onSelect, invisibleUntilHover = false }) => {
   const { showToast } = useToast();
-  const { favorites, toggleFavorite } = useGradient();
+  // const { favorites, toggleFavorite } = useGradient();
   const swatchRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [showDownloadOverlay, setShowDownloadOverlay] = useState(false);
@@ -29,7 +29,7 @@ const GradientSwatch: React.FC<GradientSwatchProps> = ({ gradient, index, fullPa
     
   const hasPoorContrast = !checkContrast(colors[0], colors[1]);
   
-  const isFavorite = favorites.some(fav => fav.id === id);
+  // const isFavorite = favorites.some(fav => fav.id === id);
   
   const handleCopyCSS = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -54,11 +54,11 @@ const GradientSwatch: React.FC<GradientSwatchProps> = ({ gradient, index, fullPa
     setShowDownloadOverlay(false);
   };
 
-  const handleToggleFavorite = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    toggleFavorite(id);
-    showToast(isFavorite ? "Removed from favorites" : "Added to favorites", { x: e.clientX, y: e.clientY });
-  };
+  // const handleToggleFavorite = (e: React.MouseEvent) => {
+  //   e.stopPropagation();
+  //   toggleFavorite(id);
+  //   showToast(isFavorite ? "Removed from favorites" : "Added to favorites", { x: e.clientX, y: e.clientY });
+  // };
 
   if (fullPage) {
     return (
@@ -97,6 +97,12 @@ const GradientSwatch: React.FC<GradientSwatchProps> = ({ gradient, index, fullPa
         <div style={{ position: 'absolute', bottom: 10, right: 10, color: 'white', opacity: 0.5, textShadow: '0 0 5px black', fontWeight: 'bold', fontSize: 16, textAlign: 'right', zIndex: 10 }}>
           <div>{name}</div>
           <div>{type === 'linear' ? `Linear ${angle}°` : 'Radial'}</div>
+          {type === 'linear' && (
+            <>
+              <div>{colors[0]}</div>
+              <div>{colors[1]}</div>
+            </>
+          )}
         </div>
       )}
       <div className={`absolute bottom-2 right-2 text-white drop-shadow-md text-right p-1 transition-opacity duration-200 ${invisibleUntilHover ? (isHovered ? 'opacity-100' : 'opacity-0') : ''}`}>
@@ -104,16 +110,22 @@ const GradientSwatch: React.FC<GradientSwatchProps> = ({ gradient, index, fullPa
         <p className="text-sm opacity-80">
           {type === 'linear' ? `Linear ${angle}°` : 'Radial'}
         </p>
+        {type === 'linear' && (
+          <>
+            <div>{colors[0]}</div>
+            <div>{colors[1]}</div>
+          </>
+        )}
       </div>
       
       <div className="absolute top-2 right-2 flex flex-col gap-2">
-        <button
+        {/* <button
           className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-all"
           onClick={handleToggleFavorite}
           aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
         >
           <Star size={18} className={isFavorite ? "text-yellow-400" : "text-white"} />
-        </button>
+        </button> */}
         <button
           className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-all"
           onClick={handleCopyCSS}

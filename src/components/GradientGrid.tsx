@@ -1,13 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import GradientSwatch from './GradientSwatch';
+import React, { useEffect, useState, useRef } from 'react';
+import { Copy, Download, Star } from 'lucide-react';
 import { useGradient } from '../context/GradientContext';
 
 
-const GradientGrid: React.FC = () => {
-  const { gradients, generateNewGradient, navigateHistory } = useGradient();
-  const [currentIndex, setCurrentIndex] = useState(0);
+import { useToast } from '../context/ToastContext';
+import { exportAsPng } from '../utils/exportUtils';
 
-  // Add keyboard event listeners for spacebar, left arrow, and right arrow
+const GradientGrid: React.FC = () => {
+  const { gradients, generateNewGradient /*, favorites, toggleFavorite */ } = useGradient();
+  const { showToast } = useToast();
+  const [showDownloadOverlay, setShowDownloadOverlay] = useState(false);
+  const gradientRef = useRef<HTMLDivElement>(null);
+  const exportRef = useRef<HTMLDivElement>(null);
+
+  // Add keyboard event listeners for spacebar
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Don't trigger if user is typing in an input field
@@ -18,26 +24,13 @@ const GradientGrid: React.FC = () => {
       if (e.code === 'Space') {
         e.preventDefault();
         generateNewGradient();
-      } else if (e.code === 'ArrowLeft') {
-        e.preventDefault();
-        // First update the current index, then navigate history
-        const newIndex = Math.max(0, currentIndex - 1);
-        setCurrentIndex(newIndex);
-        navigateHistory(-1);
-      } else if (e.code === 'ArrowRight') {
-        e.preventDefault();
-        // First update the current index, then navigate history
-        const newIndex = Math.min(gradients.length - 1, currentIndex + 1);
-        setCurrentIndex(newIndex);
-        navigateHistory(1);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [generateNewGradient, navigateHistory, gradients.length, currentIndex]);
+  }, [generateNewGradient]);
 
-  // If no gradients, show empty state
   if (gradients.length === 0) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -46,33 +39,115 @@ const GradientGrid: React.FC = () => {
     );
   }
 
-  // Display only the current gradient
-  const currentGradient = gradients[currentIndex];
+  const currentGradient = gradients[0];
+  const { type, colors, angle, name, id } = currentGradient;
+
+  const gradientCss = type === 'linear' 
+    ? `linear-gradient(${angle}deg, ${colors.join(', ')})`
+    : `radial-gradient(circle, ${colors.join(', ')})`;
+
+  // const isFavorite = favorites.some(fav => fav.id === id);
+
+  const handleCopyCSS = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const cssValue = `background: ${gradientCss};`;
+    navigator.clipboard.writeText(cssValue);
+    showToast("CSS copied to clipboard!", { x: e.clientX, y: e.clientY });
+  };
+
+  const handleDownload = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (exportRef.current) {
+      try {
+        setShowDownloadOverlay(true);
+        await new Promise(resolve => setTimeout(resolve, 100));
+        await exportAsPng(exportRef.current, name);
+        setShowDownloadOverlay(false);
+        showToast("PNG downloaded!", { x: e.clientX, y: e.clientY });
+      } catch (error) {
+        setShowDownloadOverlay(false);
+        showToast("Error downloading PNG", { x: e.clientX, y: e.clientY });
+      }
+    }
+  };
+
+  // const handleToggleFavorite = (e: React.MouseEvent) => {
+  //   e.stopPropagation();
+  //   toggleFavorite(id);
+  //   showToast(isFavorite ? "Removed from favorites" : "Added to favorites", { x: e.clientX, y: e.clientY });
+  // };
 
   return (
-    <div className="h-full w-full">
-      <div className="h-full w-full">
-        {/* Remove the fullPage prop since it's not in the interface */}
-        <GradientSwatch gradient={currentGradient} index={currentIndex} />
+    <div className="relative h-full w-full">
+      <div
+        ref={gradientRef}
+        className="h-full w-full relative"
+        style={{ background: gradientCss }}
+      >
+        {/* Visible gradient preview */}
       </div>
-      
-      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2">
-        {gradients.map((_, idx) => (
-          <button
-            key={idx}
-            className={`w-2 h-2 rounded-full ${idx === currentIndex ? 'bg-gray-800' : 'bg-gray-300'}`}
-            onClick={() => {
-              // When clicking a dot, update index and navigate history accordingly
-              const diff = idx - currentIndex;
-              setCurrentIndex(idx);
-              if (diff !== 0) {
-                navigateHistory(diff);
-              }
-            }}
-            aria-label={`View gradient ${idx + 1}`}
-          />
-        ))}
+
+      {/* Hidden export container for download */}
+      <div
+        ref={exportRef}
+        style={{ 
+          position: 'absolute', 
+          top: '-9999px', 
+          left: '-9999px', 
+          width: '400px', 
+          height: '400px', 
+          background: gradientCss, 
+          color: 'white', 
+          padding: '20px', 
+          boxSizing: 'border-box',
+          fontWeight: 'bold',
+          fontSize: '18px',
+          textAlign: 'right',
+          userSelect: 'none',
+          zIndex: 1000,
+        }}
+      >
+        <div>{name}</div>
+        <div>{type === 'linear' ? `Linear ${angle}°` : 'Radial'}</div>
+        {type === 'linear' && (
+          <>
+            <div>{colors[0]}</div>
+            <div>{colors[1]}</div>
+          </>
+        )}
       </div>
+
+      {/* Gradient info displayed together on top left */}
+      <div className="fixed top-4 left-4 text-white drop-shadow-md select-none pointer-events-none max-w-xs">
+        <div className="font-bold text-lg">{name}</div>
+        <div className="text-sm">{type === 'linear' ? `Linear ${angle}°` : 'Radial'}</div>
+        {type === 'linear' && (
+          <>
+            <div>{colors[0]}</div>
+            <div>{colors[1]}</div>
+          </>
+        )}
+      </div>
+
+      {/* Buttons fixed on top right */}
+      <div className="fixed top-4 right-4 flex flex-col gap-2 z-30">
+        <button
+          className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-all"
+          onClick={handleCopyCSS}
+          aria-label="Copy CSS"
+        >
+          <Copy size={18} className="text-white" />
+        </button>
+        <button
+          className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-all"
+          onClick={handleDownload}
+          aria-label="Download PNG"
+        >
+          <Download size={18} className="text-white" />
+        </button>
+      </div>
+
+      {/* Removed pagination dots above footer */}
     </div>
   );
 };

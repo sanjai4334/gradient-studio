@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Header from './components/Header';
 import GradientGrid from './components/GradientGrid';
-import FavoritesView from './components/FavoritesView';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import { GradientProvider, useGradient } from './context/GradientContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -47,18 +46,13 @@ const AppContent: React.FC<{ showOnboarding: boolean; setShowOnboarding: React.D
   return (
     <div className="min-h-screen flex flex-col justify-between" style={gradientStyle}>
       <main className="flex-grow flex items-center justify-center p-4 md:p-6 lg:p-8">
-        <GradientContent />
+        <GradientGrid />
       </main>
       <Header />
       <ThemeSwitcher />
       {showOnboarding && <Onboarding onClose={() => setShowOnboarding(false)} />}
     </div>
   );
-};
-
-const GradientContent: React.FC = () => {
-  const { showFavorites } = useGradient();
-  return showFavorites ? <FavoritesView /> : <GradientGrid />;
 };
 
 export default App;
