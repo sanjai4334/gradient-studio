@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Header from './components/Header';
 import GradientGrid from './components/GradientGrid';
-import ThemeSwitcher from './components/ThemeSwitcher';
 import { GradientProvider, useGradient } from './context/GradientContext';
-import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './context/ToastContext';
 import Onboarding from './components/Onboarding';
 
@@ -20,13 +18,11 @@ function App() {
   }, []);
 
   return (
-    <ThemeProvider>
-      <GradientProvider>
-        <ToastProvider>
-          <AppContent showOnboarding={showOnboarding} setShowOnboarding={setShowOnboarding} />
-        </ToastProvider>
-      </GradientProvider>
-    </ThemeProvider>
+    <GradientProvider>
+      <ToastProvider>
+        <AppContent showOnboarding={showOnboarding} setShowOnboarding={setShowOnboarding} />
+      </ToastProvider>
+    </GradientProvider>
   );
 }
 
@@ -49,7 +45,6 @@ const AppContent: React.FC<{ showOnboarding: boolean; setShowOnboarding: React.D
         <GradientGrid />
       </main>
       <Header />
-      <ThemeSwitcher />
       {showOnboarding && <Onboarding onClose={() => setShowOnboarding(false)} />}
     </div>
   );

@@ -1,10 +1,8 @@
 import React from 'react';
 import { Palette } from 'lucide-react';
-import { useTheme } from '../context/ThemeContext';
 import { useGradient } from '../context/GradientContext';
 
 const Header: React.FC = () => {
-  const { theme } = useTheme();
   const { generateNewGradient } = useGradient();
 
   return (
