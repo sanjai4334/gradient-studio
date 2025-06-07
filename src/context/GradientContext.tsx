@@ -4,9 +4,8 @@ import { generateRandomGradient } from '../utils/gradientUtils';
 import type { Gradient } from '../types/Gradient';
 
 interface GradientContextType {
-  gradients: Gradient[];
+  gradient: Gradient | null;
   generateNewGradient: () => void;
-  toggleLock: (id: string) => void;
 }
 
 const GradientContext = createContext<GradientContextType | undefined>(undefined);
@@ -20,46 +19,22 @@ export const useGradient = () => {
 };
 
 export const GradientProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [gradients, setGradients] = useState<Gradient[]>([]);
+  const [gradient, setGradient] = useState<Gradient | null>(null);
 
-  // Initialize and generate initial gradients
+  // Initialize with a random gradient
   useEffect(() => {
-    const initialGradients = Array.from({ length: 8 }, () => generateRandomGradient());
-    setGradients(initialGradients);
+    setGradient(generateRandomGradient());
   }, []);
 
   const generateNewGradient = useCallback(() => {
-    setGradients(prevGradients => {
-      // Find the index of the first unlocked gradient
-      const indexToUpdate = prevGradients.findIndex(gradient => !gradient.isLocked);
-      if (indexToUpdate === -1) {
-        // If all are locked, return previous gradients unchanged
-        return prevGradients;
-      }
-
-      // Generate a new gradient for only the selected index
-      const newGradient = generateRandomGradient();
-
-      const newGradients = prevGradients.map((gradient, idx) =>
-        idx === indexToUpdate ? newGradient : gradient
-      );
-
-      return newGradients;
-    });
-  }, []);
-
-  const toggleLock = useCallback((id: string) => {
-    setGradients(prev => prev.map(gradient =>
-      gradient.id === id ? { ...gradient, isLocked: !gradient.isLocked } : gradient
-    ));
+    setGradient(generateRandomGradient());
   }, []);
 
   return (
     <GradientContext.Provider
       value={{
-        gradients,
+        gradient,
         generateNewGradient,
-        toggleLock,
       }}
     >
       {children}

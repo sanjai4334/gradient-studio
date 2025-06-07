@@ -2,25 +2,20 @@ import React, { useEffect, useRef } from 'react';
 import { Copy, Download } from 'lucide-react';
 import { useGradient } from '../context/GradientContext';
 
-
 import { useToast } from '../context/ToastContext';
 import { exportAsPng } from '../utils/exportUtils';
 
 const GradientGrid: React.FC = () => {
-  const { gradients, generateNewGradient /*, favorites, toggleFavorite */ } = useGradient();
+  const { gradient, generateNewGradient } = useGradient();
   const { showToast } = useToast();
-  // Removed unused showDownloadOverlay state
   const gradientRef = useRef<HTMLDivElement>(null);
   const exportRef = useRef<HTMLDivElement>(null);
 
-  // Add keyboard event listeners for spacebar
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't trigger if user is typing in an input field
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
         return;
       }
-      
       if (e.code === 'Space') {
         e.preventDefault();
         generateNewGradient();
@@ -31,22 +26,19 @@ const GradientGrid: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [generateNewGradient]);
 
-  if (gradients.length === 0) {
+  if (!gradient) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-gray-500">No gradients available. Generate some!</p>
+        <p className="text-gray-500">No gradient available. Generate one!</p>
       </div>
     );
   }
 
-  const currentGradient = gradients[0];
-  const { type, colors, angle, name } = currentGradient;
+  const { type, colors, angle, name } = gradient;
 
   const gradientCss = type === 'linear' 
     ? `linear-gradient(${angle}deg, ${colors.join(', ')})`
     : `radial-gradient(circle, ${colors.join(', ')})`;
-
-  // const isFavorite = favorites.some(fav => fav.id === id);
 
   const handleCopyCSS = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -59,7 +51,6 @@ const GradientGrid: React.FC = () => {
     e.stopPropagation();
     if (exportRef.current) {
       try {
-        // Removed showDownloadOverlay logic
         await new Promise(resolve => setTimeout(resolve, 100));
         await exportAsPng(exportRef.current, name);
         showToast("PNG downloaded!", { x: e.clientX, y: e.clientY });
@@ -68,12 +59,6 @@ const GradientGrid: React.FC = () => {
       }
     }
   };
-
-  // const handleToggleFavorite = (e: React.MouseEvent) => {
-  //   e.stopPropagation();
-  //   toggleFavorite(id);
-  //   showToast(isFavorite ? "Removed from favorites" : "Added to favorites", { x: e.clientX, y: e.clientY });
-  // };
 
   return (
     <div className="relative h-full w-full">
@@ -85,7 +70,6 @@ const GradientGrid: React.FC = () => {
         {/* Visible gradient preview */}
       </div>
 
-      {/* Hidden export container for download */}
       <div
         ref={exportRef}
         style={{ 
@@ -115,7 +99,6 @@ const GradientGrid: React.FC = () => {
         )}
       </div>
 
-      {/* Gradient info displayed together on top left */}
       <div className="fixed top-4 left-4 text-white drop-shadow-md select-none pointer-events-none max-w-xs">
         <div className="font-bold text-lg">{name}</div>
         <div className="text-sm">{type === 'linear' ? `Linear ${angle}°` : 'Radial'}</div>
@@ -127,7 +110,6 @@ const GradientGrid: React.FC = () => {
         )}
       </div>
 
-      {/* Buttons fixed on top right */}
       <div className="fixed top-4 right-4 flex flex-col gap-2 z-30">
         <button
           className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-all"
@@ -144,8 +126,6 @@ const GradientGrid: React.FC = () => {
           <Download size={18} className="text-white" />
         </button>
       </div>
-
-      {/* Removed pagination dots above footer */}
     </div>
   );
 };

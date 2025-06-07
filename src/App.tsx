@@ -27,10 +27,10 @@ function App() {
 }
 
 const AppContent: React.FC<{ showOnboarding: boolean; setShowOnboarding: React.Dispatch<React.SetStateAction<boolean>> }> = ({ showOnboarding, setShowOnboarding }) => {
-  const { gradients } = useGradient();
+  const { gradient } = useGradient();
 
-  // Use the first gradient for the background
-  const backgroundGradient = gradients.length > 0 ? gradients[0] : null;
+  // Use the single gradient for the background
+  const backgroundGradient = gradient;
 
   // Construct CSS gradient string
   const gradientStyle = backgroundGradient
