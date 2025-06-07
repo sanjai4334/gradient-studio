@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ArrowRight, ArrowLeft, Keyboard, Monitor, Download, Star } from 'lucide-react';
+import { X, ArrowRight, ArrowLeft, Monitor, Download } from 'lucide-react';
 
 interface OnboardingProps {
   onClose: () => void;

@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Copy, Download, Star } from 'lucide-react';
+import React, { useEffect, useRef } from 'react';
+import { Copy, Download } from 'lucide-react';
 import { useGradient } from '../context/GradientContext';
 
 
@@ -9,7 +9,7 @@ import { exportAsPng } from '../utils/exportUtils';
 const GradientGrid: React.FC = () => {
   const { gradients, generateNewGradient /*, favorites, toggleFavorite */ } = useGradient();
   const { showToast } = useToast();
-  const [showDownloadOverlay, setShowDownloadOverlay] = useState(false);
+  // Removed unused showDownloadOverlay state
   const gradientRef = useRef<HTMLDivElement>(null);
   const exportRef = useRef<HTMLDivElement>(null);
 
@@ -40,7 +40,7 @@ const GradientGrid: React.FC = () => {
   }
 
   const currentGradient = gradients[0];
-  const { type, colors, angle, name, id } = currentGradient;
+  const { type, colors, angle, name } = currentGradient;
 
   const gradientCss = type === 'linear' 
     ? `linear-gradient(${angle}deg, ${colors.join(', ')})`
@@ -59,13 +59,11 @@ const GradientGrid: React.FC = () => {
     e.stopPropagation();
     if (exportRef.current) {
       try {
-        setShowDownloadOverlay(true);
+        // Removed showDownloadOverlay logic
         await new Promise(resolve => setTimeout(resolve, 100));
         await exportAsPng(exportRef.current, name);
-        setShowDownloadOverlay(false);
         showToast("PNG downloaded!", { x: e.clientX, y: e.clientY });
       } catch (error) {
-        setShowDownloadOverlay(false);
         showToast("Error downloading PNG", { x: e.clientX, y: e.clientY });
       }
     }

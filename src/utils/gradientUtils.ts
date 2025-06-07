@@ -1,4 +1,5 @@
 import { generateRandomName } from './nameUtils';
+import { Gradient } from '../types/Gradient';
 
 /**
  * Generate a random HSL color

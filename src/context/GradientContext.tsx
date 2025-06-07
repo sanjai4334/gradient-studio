@@ -1,15 +1,12 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { generateRandomGradient } from '../utils/gradientUtils';
+
+import type { Gradient } from '../types/Gradient';
 
 interface GradientContextType {
   gradients: Gradient[];
   generateNewGradient: () => void;
   toggleLock: (id: string) => void;
-}
-
-interface GradientHistoryEntry {
-  gradients: Gradient[];
-  timestamp: number;
 }
 
 const GradientContext = createContext<GradientContextType | undefined>(undefined);
@@ -24,12 +21,6 @@ export const useGradient = () => {
 
 export const GradientProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [gradients, setGradients] = useState<Gradient[]>([]);
-
-  // Double queue history implementation with max size 10
-  const MAX_HISTORY_SIZE = 10;
-  const historyFront = useRef<GradientHistoryEntry[]>([]);
-  const historyBack = useRef<GradientHistoryEntry[]>([]);
-  const currentEntry = useRef<GradientHistoryEntry | null>(null);
 
   // Initialize and generate initial gradients
   useEffect(() => {
