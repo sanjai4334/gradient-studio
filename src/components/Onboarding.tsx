@@ -16,16 +16,9 @@ const Onboarding: React.FC<OnboardingProps> = ({ onClose }) => {
       tip: "Press spacebar anytime to generate a new gradient."
     },
     {
-      title: "Navigate Your History",
-      icon: <Keyboard size={40} />,
-      description: "Use the left and right arrow keys to browse through your recently generated gradients.",
-      tip: "Your last 20 gradients are automatically saved."
-    },
-    {
       title: "Save and Export",
       icon: <Download size={40} />,
-      description: "Copy the CSS code directly or download gradients as PNG files.",
-      tip: "Hover over any gradient to see the available actions."
+      description: "Copy the CSS code directly or download gradients as PNG files."
     }
   ];
   
@@ -69,9 +62,11 @@ const Onboarding: React.FC<OnboardingProps> = ({ onClose }) => {
           </div>
           <h2 className="text-2xl font-bold mb-2">{step.title}</h2>
           <p className="text-gray-600 mb-4">{step.description}</p>
-          <div className="bg-blue-50 p-3 rounded-md">
-            <p className="text-blue-700 text-sm"><strong>Tip:</strong> {step.tip}</p>
-          </div>
+          {step.tip &&
+            <div className="bg-blue-50 p-3 rounded-md">
+              <p className="text-blue-700 text-sm"><strong>Tip:</strong> {step.tip}</p>
+            </div>
+          }
         </div>
         
         <div className="flex justify-between mt-6">
