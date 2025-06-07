@@ -3,7 +3,7 @@ import { generateRandomName } from './nameUtils';
 /**
  * Generate a random HSL color
  */
-export const generateRandomHSLColor = (): string => {
+const generateRandomHSLColor = (): string => {
   const h = Math.floor(Math.random() * 360);
   const s = Math.floor(Math.random() * 30) + 70; // 70-100%
   const l = Math.floor(Math.random() * 30) + 35; // 35-65%
@@ -13,7 +13,7 @@ export const generateRandomHSLColor = (): string => {
 /**
  * Generate a complementary HSL color based on the given color
  */
-export const generateComplementaryHSLColor = (baseColor: string): string => {
+const generateComplementaryHSLColor = (baseColor: string): string => {
   // Extract h, s, l values
   const matches = baseColor.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
   if (!matches) return generateRandomHSLColor();
